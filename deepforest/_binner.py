@@ -10,10 +10,9 @@ __all__ = ["Binner"]
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils import check_random_state, check_array
+from sklearn.utils import check_array, check_random_state
 
 from . import _cutils as _LIB
-
 
 X_DTYPE = np.float64
 X_BINNED_DTYPE = np.uint8

@@ -14,30 +14,34 @@ __all__ = [
 ]
 
 import numbers
-from warnings import warn
 import threading
-from typing import List
-
 from abc import ABCMeta, abstractmethod
-import numpy as np
-from scipy.sparse import issparse
-from joblib import Parallel, delayed
-from joblib import effective_n_jobs
+from typing import List
+from warnings import warn
 
-from sklearn.base import clone
-from sklearn.base import BaseEstimator
-from sklearn.base import MetaEstimatorMixin
-from sklearn.base import is_classifier
-from sklearn.base import ClassifierMixin, RegressorMixin, MultiOutputMixin
-from sklearn.utils import check_random_state, compute_sample_weight
+import numpy as np
+from joblib import Parallel, delayed, effective_n_jobs
+from scipy.sparse import issparse
+from sklearn.base import (
+    BaseEstimator,
+    ClassifierMixin,
+    MetaEstimatorMixin,
+    MultiOutputMixin,
+    RegressorMixin,
+    clone,
+    is_classifier,
+)
 from sklearn.exceptions import DataConversionWarning
+from sklearn.utils import check_random_state, compute_sample_weight
 from sklearn.utils.fixes import _joblib_parallel_args
-from sklearn.utils.validation import check_is_fitted, _check_sample_weight
-from sklearn.utils.validation import _deprecate_positional_args
+from sklearn.utils.validation import (
+    _check_sample_weight,
+    _deprecate_positional_args,
+    check_is_fitted,
+)
 
 from . import _cutils as _LIB
 from . import _forest as _C_FOREST
-
 from .tree import (
     DecisionTreeClassifier,
     DecisionTreeRegressor,
@@ -45,7 +49,6 @@ from .tree import (
     ExtraTreeRegressor,
 )
 from .tree._tree import DOUBLE
-
 
 MAX_INT = np.iinfo(np.int32).max
 

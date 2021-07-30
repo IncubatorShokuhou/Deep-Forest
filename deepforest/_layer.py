@@ -9,9 +9,13 @@ __all__ = [
 ]
 
 import numpy as np
-from sklearn.base import is_classifier
+from sklearn.base import (
+    BaseEstimator,
+    ClassifierMixin,
+    RegressorMixin,
+    is_classifier,
+)
 from sklearn.metrics import accuracy_score, mean_squared_error
-from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 
 from . import _utils
 from ._estimator import Estimator

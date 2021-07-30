@@ -1,8 +1,8 @@
 import os
-import numpy
 from distutils.version import LooseVersion
-from numpy.distutils.misc_util import Configuration
 
+import numpy
+from numpy.distutils.misc_util import Configuration
 
 CYTHON_MIN_VERSION = "0.24"
 

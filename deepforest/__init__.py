@@ -1,9 +1,16 @@
 from .cascade import CascadeForestClassifier, CascadeForestRegressor
-from .forest import RandomForestClassifier, RandomForestRegressor
-from .forest import ExtraTreesClassifier, ExtraTreesRegressor
-from .tree import DecisionTreeClassifier, DecisionTreeRegressor
-from .tree import ExtraTreeClassifier, ExtraTreeRegressor
-
+from .forest import (
+    ExtraTreesClassifier,
+    ExtraTreesRegressor,
+    RandomForestClassifier,
+    RandomForestRegressor,
+)
+from .tree import (
+    DecisionTreeClassifier,
+    DecisionTreeRegressor,
+    ExtraTreeClassifier,
+    ExtraTreeRegressor,
+)
 
 __all__ = [
     "CascadeForestClassifier",

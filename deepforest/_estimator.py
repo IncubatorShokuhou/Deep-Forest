@@ -4,17 +4,23 @@
 __all__ = ["Estimator"]
 
 import numpy as np
-from .forest import (
-    RandomForestClassifier,
-    ExtraTreesClassifier,
-    RandomForestRegressor,
-    ExtraTreesRegressor,
+from sklearn.base import is_classifier, is_regressor
+from sklearn.ensemble import (
+    ExtraTreesClassifier as sklearn_ExtraTreesClassifier,
 )
+from sklearn.ensemble import ExtraTreesRegressor as sklearn_ExtraTreesRegressor
 from sklearn.ensemble import (
     RandomForestClassifier as sklearn_RandomForestClassifier,
-    ExtraTreesClassifier as sklearn_ExtraTreesClassifier,
+)
+from sklearn.ensemble import (
     RandomForestRegressor as sklearn_RandomForestRegressor,
-    ExtraTreesRegressor as sklearn_ExtraTreesRegressor,
+)
+
+from .forest import (
+    ExtraTreesClassifier,
+    ExtraTreesRegressor,
+    RandomForestClassifier,
+    RandomForestRegressor,
 )
 
 
@@ -53,6 +59,9 @@ def make_classifier_estimator(
                 n_jobs=n_jobs,
                 random_state=random_state,
             )
+        else:
+            msg = "Unknown type of backend, which should be one of {{custom, sklearn}}."
+            raise NotImplementedError(msg)
     # ExtraTreesClassifier
     elif name == "erf":
         if backend == "custom":
@@ -77,6 +86,9 @@ def make_classifier_estimator(
                 n_jobs=n_jobs,
                 random_state=random_state,
             )
+        else:
+            msg = "Unknown type of backend, which should be one of {{custom, sklearn}}."
+            raise NotImplementedError(msg)
     else:
         msg = "Unknown type of estimator, which should be one of {{rf, erf}}."
         raise NotImplementedError(msg)
@@ -119,6 +131,9 @@ def make_regressor_estimator(
                 n_jobs=n_jobs,
                 random_state=random_state,
             )
+        else:
+            msg = "Unknown type of backend, which should be one of {{custom, sklearn}}."
+            raise NotImplementedError(msg)
     # ExtraTreesRegressor
     elif name == "erf":
         if backend == "custom":
@@ -143,6 +158,9 @@ def make_regressor_estimator(
                 n_jobs=n_jobs,
                 random_state=random_state,
             )
+        else:
+            msg = "Unknown type of backend, which should be one of {{custom, sklearn}}."
+            raise NotImplementedError(msg)
     else:
         msg = "Unknown type of estimator, which should be one of {{rf, erf}}."
         raise NotImplementedError(msg)
@@ -219,7 +237,8 @@ class Estimator(object):
     def predict(self, X):
         if self.is_classifier:
             return self.estimator_.predict_proba(X)
-        pred = self.estimator_.predict(X)
-        if len(pred.shape) == 1:
-            pred = np.expand_dims(pred, 1)
-        return pred
+        else:
+            pred = self.estimator_.predict(X)
+            if len(pred.shape) == 1:
+                pred = np.expand_dims(pred, 1)
+            return pred

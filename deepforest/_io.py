@@ -8,9 +8,10 @@ __all__ = ["Buffer"]
 
 import os
 import shutil
-import warnings
 import tempfile
-from joblib import load, dump
+import warnings
+
+from joblib import dump, load
 
 
 class Buffer(object):
@@ -305,8 +306,8 @@ def model_loadobj(dirname, obj_type, d=None):
     elif obj_type == "layer":
         from ._layer import (
             ClassificationCascadeLayer,
-            RegressionCascadeLayer,
             CustomCascadeLayer,
+            RegressionCascadeLayer,
         )
 
         if not isinstance(d, dict):

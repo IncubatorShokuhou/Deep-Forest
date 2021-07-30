@@ -64,7 +64,7 @@ cpdef _map_to_bins(object X,
 
     Parameters
     ----------
-    data : ndarray, shape (n_samples, n_features)
+    X : ndarray, shape (n_samples, n_features)
         The numerical data to bin.
     binning_thresholds : list of arrays
         For each feature, stores the increasing numeric values that are

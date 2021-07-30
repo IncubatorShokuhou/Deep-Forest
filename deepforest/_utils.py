@@ -1,8 +1,9 @@
 """Implement utilities used in deep forest."""
 
 
-import numpy as np
 from datetime import datetime
+
+import numpy as np
 
 from . import _cutils as _LIB
 
