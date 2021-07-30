@@ -1,6 +1,5 @@
 """Implementation of Deep Forest."""
 
-
 __all__ = ["CascadeForestClassifier", "CascadeForestRegressor"]
 
 import numbers
@@ -36,18 +35,20 @@ def _get_predictor_kwargs(predictor_kwargs, **kwargs) -> dict:
 
 
 def _build_classifier_predictor(
-    predictor_name,
-    criterion,
-    n_estimators,
-    n_outputs,
-    max_depth=None,
-    min_samples_split=2,
-    min_samples_leaf=1,
-    n_jobs=None,
-    random_state=None,
-    predictor_kwargs={},
+        predictor_name,
+        criterion,
+        n_estimators,
+        n_outputs,
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        n_jobs=None,
+        random_state=None,
+        predictor_kwargs=None,
 ):
     """Build the predictor concatenated to the deep forest."""
+    if predictor_kwargs is None:
+        predictor_kwargs = {}
     predictor_name = predictor_name.lower()
 
     # Random Forest
@@ -122,18 +123,20 @@ def _build_classifier_predictor(
 
 
 def _build_regressor_predictor(
-    predictor_name,
-    criterion,
-    n_estimators,
-    n_outputs,
-    max_depth=None,
-    min_samples_split=2,
-    min_samples_leaf=1,
-    n_jobs=None,
-    random_state=None,
-    predictor_kwargs={},
+        predictor_name,
+        criterion,
+        n_estimators,
+        n_outputs,
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        n_jobs=None,
+        random_state=None,
+        predictor_kwargs=None,
 ):
     """Build the predictor concatenated to the deep forest."""
+    if predictor_kwargs is None:
+        predictor_kwargs = {}
     predictor_name = predictor_name.lower()
 
     # Random Forest
@@ -298,7 +301,6 @@ __classifier_model_doc = """
           displayed;
         - If ``> 1``, full logging information will be displayed.
 """
-
 
 __classifier_fit_doc = """
 
@@ -485,28 +487,30 @@ def deepforest_model_doc(header, item):
 
 class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
     def __init__(
-        self,
-        n_bins=255,
-        bin_subsample=200000,
-        bin_type="percentile",
-        max_layers=20,
-        criterion="",
-        n_estimators=2,
-        n_trees=100,
-        max_depth=None,
-        min_samples_split=2,
-        min_samples_leaf=1,
-        use_predictor=False,
-        predictor="forest",
-        predictor_kwargs={},
-        backend="custom",
-        n_tolerant_rounds=2,
-        delta=1e-5,
-        partial_mode=False,
-        n_jobs=None,
-        random_state=None,
-        verbose=1,
+            self,
+            n_bins=255,
+            bin_subsample=200000,
+            bin_type="percentile",
+            max_layers=20,
+            criterion="",
+            n_estimators=2,
+            n_trees=100,
+            max_depth=None,
+            min_samples_split=2,
+            min_samples_leaf=1,
+            use_predictor=False,
+            predictor="forest",
+            predictor_kwargs=None,
+            backend="custom",
+            n_tolerant_rounds=2,
+            delta=1e-5,
+            partial_mode=False,
+            n_jobs=None,
+            random_state=None,
+            verbose=1,
     ):
+        if predictor_kwargs is None:
+            predictor_kwargs = {}
         self.n_bins = n_bins
         self.bin_subsample = bin_subsample
         self.bin_type = bin_type
@@ -720,7 +724,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
         Remove cascade layers temporarily added, along with dumped objects on
         the local buffer if `partial_mode` is True."""
         for layer_idx in range(
-            self.n_layers_ - 1, self.n_layers_ - self.n_tolerant_rounds, -1
+                self.n_layers_ - 1, self.n_layers_ - self.n_tolerant_rounds, -1
         ):
             self.layers_.pop("layer_{}".format(layer_idx))
             self.binners_.pop("binner_{}".format(layer_idx))
@@ -772,7 +776,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
             y,
             multi_output=True
             if type_of_target(y)
-            in ("continuous-multioutput", "multiclass-multioutput")
+               in ("continuous-multioutput", "multiclass-multioutput")
             else False,
         )
 
@@ -1064,7 +1068,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
                 raise AttributeError(msg.format(idx))
 
             if is_classifier(self) and not callable(
-                getattr(estimator, "predict_proba", None)
+                    getattr(estimator, "predict_proba", None)
             ):
                 msg = (
                     "The `predict_proba` method of estimator = {} is not"
@@ -1073,7 +1077,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
                 raise AttributeError(msg.format(idx))
 
             if not is_classifier(self) and not callable(
-                getattr(estimator, "predict", None)
+                    getattr(estimator, "predict", None)
             ):
                 msg = "The `predict` method of estimator = {} is not callable."
                 raise AttributeError(msg.format(idx))
@@ -1104,7 +1108,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
             raise AttributeError(msg)
 
         if is_classifier(self) and not callable(
-            getattr(predictor, "predict_proba", None)
+                getattr(predictor, "predict_proba", None)
         ):
             msg = (
                 "The `predict_proba` method of the predictor is not"
@@ -1113,7 +1117,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
             raise AttributeError(msg)
 
         if not is_classifier(self) and not callable(
-            getattr(predictor, "predict", None)
+                getattr(predictor, "predict", None)
         ):
             msg = "The `predict` method of the predictor is not callable."
             raise AttributeError(msg)
@@ -1336,27 +1340,27 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
 )
 class CascadeForestClassifier(BaseCascadeForest, ClassifierMixin):
     def __init__(
-        self,
-        n_bins=255,
-        bin_subsample=200000,
-        bin_type="percentile",
-        max_layers=20,
-        criterion="gini",
-        n_estimators=2,
-        n_trees=100,
-        max_depth=None,
-        min_samples_split=2,
-        min_samples_leaf=1,
-        use_predictor=False,
-        predictor="forest",
-        predictor_kwargs={},
-        backend="custom",
-        n_tolerant_rounds=2,
-        delta=1e-5,
-        partial_mode=False,
-        n_jobs=None,
-        random_state=None,
-        verbose=1,
+            self,
+            n_bins=255,
+            bin_subsample=200000,
+            bin_type="percentile",
+            max_layers=20,
+            criterion="gini",
+            n_estimators=2,
+            n_trees=100,
+            max_depth=None,
+            min_samples_split=2,
+            min_samples_leaf=1,
+            use_predictor=False,
+            predictor="forest",
+            predictor_kwargs=None,
+            backend="custom",
+            n_tolerant_rounds=2,
+            delta=1e-5,
+            partial_mode=False,
+            n_jobs=None,
+            random_state=None,
+            verbose=1,
     ):
         super().__init__(
             n_bins=n_bins,
@@ -1382,6 +1386,8 @@ class CascadeForestClassifier(BaseCascadeForest, ClassifierMixin):
         )
 
         # Used to deal with classification labels
+        if predictor_kwargs is None:
+            predictor_kwargs = {}
         self.labels_are_encoded = False
         self.type_of_target_ = None
         self.label_encoder_ = None
@@ -1429,7 +1435,7 @@ class CascadeForestClassifier(BaseCascadeForest, ClassifierMixin):
             y,
             multi_output=True
             if type_of_target(y)
-            in ("continuous-multioutput", "multiclass-multioutput")
+               in ("continuous-multioutput", "multiclass-multioutput")
             else False,
         )
         # Check the input for classification
@@ -1548,27 +1554,27 @@ class CascadeForestClassifier(BaseCascadeForest, ClassifierMixin):
 )
 class CascadeForestRegressor(BaseCascadeForest, RegressorMixin):
     def __init__(
-        self,
-        n_bins=255,
-        bin_subsample=200000,
-        bin_type="percentile",
-        max_layers=20,
-        criterion="mse",
-        n_estimators=2,
-        n_trees=100,
-        max_depth=None,
-        min_samples_split=2,
-        min_samples_leaf=1,
-        use_predictor=False,
-        predictor="forest",
-        predictor_kwargs={},
-        backend="custom",
-        n_tolerant_rounds=2,
-        delta=1e-5,
-        partial_mode=False,
-        n_jobs=None,
-        random_state=None,
-        verbose=1,
+            self,
+            n_bins=255,
+            bin_subsample=200000,
+            bin_type="percentile",
+            max_layers=20,
+            criterion="mse",
+            n_estimators=2,
+            n_trees=100,
+            max_depth=None,
+            min_samples_split=2,
+            min_samples_leaf=1,
+            use_predictor=False,
+            predictor="forest",
+            predictor_kwargs=None,
+            backend="custom",
+            n_tolerant_rounds=2,
+            delta=1e-5,
+            partial_mode=False,
+            n_jobs=None,
+            random_state=None,
+            verbose=1,
     ):
         super().__init__(
             n_bins=n_bins,
@@ -1594,6 +1600,8 @@ class CascadeForestRegressor(BaseCascadeForest, RegressorMixin):
         )
 
         # Used to deal with target values
+        if predictor_kwargs is None:
+            predictor_kwargs = {}
         self.type_of_target_ = None
 
     def _check_target_values(self, y):
@@ -1608,10 +1616,10 @@ class CascadeForestRegressor(BaseCascadeForest, RegressorMixin):
             raise ValueError(msg)
 
         if self.type_of_target_ not in (
-            "continuous",
-            "continuous-multioutput",
-            "multiclass",
-            "multiclass-multioutput",
+                "continuous",
+                "continuous-multioutput",
+                "multiclass",
+                "multiclass-multioutput",
         ):
             msg = (
                 "CascadeForestRegressor is used for univariate or"
@@ -1641,7 +1649,7 @@ class CascadeForestRegressor(BaseCascadeForest, RegressorMixin):
             y,
             multi_output=True
             if type_of_target(y)
-            in ("continuous-multioutput", "multiclass-multioutput")
+               in ("continuous-multioutput", "multiclass-multioutput")
             else False,
         )
 
