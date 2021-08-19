@@ -1084,7 +1084,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
         # Build the predictor if `self.use_predictor` is True
         if self.use_predictor:
             # Use built-in predictors
-            if self.predictor in ("forest", "xgboost", "lightgbm"):
+            if self.predictor in ("forest", "xgboost", "lightgbm", "xgboost-gpu", "lightgbm-gpu"):
                 if is_classifier(self):
                     self.predictor_ = _build_classifier_predictor(
                         self.predictor,
