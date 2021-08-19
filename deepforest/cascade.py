@@ -90,6 +90,30 @@ def _build_classifier_predictor(
                 random_state=random_state,
             )
         )
+    # XGBoost gpu
+    elif predictor_name == "xgboost-gpu":
+        try:
+            xgb = __import__("xgboost.sklearn")
+        except ModuleNotFoundError:
+            msg = (
+                "Cannot load the module XGBoost when building the predictor."
+                " Please make sure that XGBoost is installed."
+            )
+            raise ModuleNotFoundError(msg)
+
+        # The argument `tree_method` is always set as `hist` for XGBoost,
+        # because the exact mode of XGBoost is too slow.
+        objective = "multi:softmax" if n_outputs > 2 else "binary:logistic"
+        predictor = xgb.sklearn.XGBClassifier(
+            **_get_predictor_kwargs(
+                predictor_kwargs,
+                objective=objective,
+                n_estimators=n_estimators,
+                tree_method="gpu_hist",
+                n_jobs=n_jobs,
+                random_state=random_state,
+            )
+        )
     # LightGBM
     elif predictor_name == "lightgbm":
         try:
@@ -111,10 +135,42 @@ def _build_classifier_predictor(
                 random_state=random_state,
             )
         )
+    # LightGBM gpu
+    elif predictor_name == "lightgbm-gpu":
+        device = "gpu"
+        try:
+            lgb = lgb.LGBMClassifier(device=device)
+            lgb.fit(np.zeros((2, 2)), [0, 1])
+            del lgb
+        except:
+            try:
+                device = "cuda"
+                lgb = lgb.LGBMClassifier(device=device)
+                lgb.fit(np.zeros((2, 2)), [0, 1])
+                del lgb
+            except ModuleNotFoundError:
+                msg = (
+                    "Cannot load the module LightGBM when building the predictor."
+                    " Please make sure that LightGBM is installed."
+                )
+                raise ModuleNotFoundError(msg)
+
+        objective = "multiclass" if n_outputs > 2 else "binary"
+        
+        predictor = lgb.LGBMClassifier(
+            **_get_predictor_kwargs(
+                predictor_kwargs,
+                objective=objective,
+                n_estimators=n_estimators,
+                n_jobs=n_jobs,
+                random_state=random_state,
+                device= device
+            )
+        )
     else:
         msg = (
             "The name of the predictor should be one of {{forest, xgboost,"
-            " lightgbm}}, but got {} instead."
+            " lightgbm ,xgboost-gpu ,lightgbm-gpu}}, but got {} instead."
         )
         raise NotImplementedError(msg.format(predictor_name))
 
@@ -176,6 +232,30 @@ def _build_regressor_predictor(
                 random_state=random_state,
             )
         )
+        # XGBoost gpu
+    elif predictor_name == "xgboost-gpu":
+        try:
+            xgb = __import__("xgboost.sklearn")
+        except ModuleNotFoundError:
+            msg = (
+                "Cannot load the module XGBoost when building the predictor."
+                " Please make sure that XGBoost is installed."
+            )
+            raise ModuleNotFoundError(msg)
+
+        # The argument `tree_method` is always set as `hist` for XGBoost,
+        # because the exact mode of XGBoost is too slow.
+        objective = "reg:squarederror"
+        predictor = xgb.sklearn.XGBRegressor(
+            **_get_predictor_kwargs(
+                predictor_kwargs,
+                objective=objective,
+                n_estimators=n_estimators,
+                tree_method="gpu_hist",
+                n_jobs=n_jobs,
+                random_state=random_state,
+            )
+        )
     # LightGBM
     elif predictor_name == "lightgbm":
         try:
@@ -197,10 +277,41 @@ def _build_regressor_predictor(
                 random_state=random_state,
             )
         )
+    # LightGBM gpu
+    elif predictor_name == "lightgbm-gpu":
+        device = "gpu"
+        try:
+            lgb = lgb.LGBMRegressor(device=device)
+            lgb.fit(np.zeros((2, 2)), [0, 1])
+            del lgb
+        except:
+            try:
+                device = "cuda"
+                lgb = lgb.LGBMRegressor(device=device)
+                lgb.fit(np.zeros((2, 2)), [0, 1])
+                del lgb
+            except ModuleNotFoundError:
+                msg = (
+                    "Cannot load the module LightGBM when building the predictor."
+                    " Please make sure that LightGBM is installed."
+                )
+                raise ModuleNotFoundError(msg)
+
+        objective = "regression"
+        predictor = lgb.LGBMRegressor(
+            **_get_predictor_kwargs(
+                predictor_kwargs,
+                objective=objective,
+                n_estimators=n_estimators,
+                n_jobs=n_jobs,
+                random_state=random_state,
+                device=device,
+            )
+        )
     else:
         msg = (
-            "The name of the predictor should be one of {{forest, xgboost,"
-            " lightgbm}}, but got {} instead."
+            "The name of the predictor should be one of  {{forest, xgboost,"
+            " lightgbm ,xgboost-gpu ,lightgbm-gpu}}, but got {} instead."
         )
         raise NotImplementedError(msg.format(predictor_name))
 
