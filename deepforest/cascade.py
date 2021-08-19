@@ -975,7 +975,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
             # Use built-in predictors
             if self.predictor in ("forest", "xgboost", "lightgbm"):
                 if is_classifier(self):
-                    self._predictor = _build_classifier_predictor(
+                    self.predictor_ = _build_classifier_predictor(
                         self.predictor,
                         self.criterion,
                         self.n_trees,
@@ -988,7 +988,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
                         self.predictor_kwargs,
                     )
                 else:
-                    self._predictor = _build_regressor_predictor(
+                    self.predictor_ = _build_regressor_predictor(
                         self.predictor,
                         self.criterion,
                         self.n_trees,
@@ -1001,7 +1001,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
                         self.predictor_kwargs,
                     )
             elif self.predictor == "custom":
-                if not hasattr(self, "_predictor"):
+                if not hasattr(self, "predictor_"):
                     msg = "Missing predictor after calling `set_predictor`"
                     raise RuntimeError(msg)
 
@@ -1025,7 +1025,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
                 print(msg.format(_utils.ctime(), self.predictor))
 
             tic = time.time()
-            self._predictor.fit(X_middle_train_, y, sample_weight)
+            self.predictor_.fit(X_middle_train_, y, sample_weight)
             toc = time.time()
 
             if self.verbose > 0:
@@ -1033,7 +1033,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
                 print(msg.format(_utils.ctime(), toc - tic))
 
             self._set_binner(self.n_layers_, binner_)
-            self._predictor = self.buffer_.cache_predictor(self._predictor)
+            self.predictor_ = self.buffer_.cache_predictor(self.predictor_)
 
         self.is_fitted_ = True
 
@@ -1120,7 +1120,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
 
         # Set related attributes
         self.predictor = "custom"
-        self._predictor = predictor
+        self.predictor_ = predictor
         self.use_predictor = True
 
     def get_layer_feature_importances(self, layer_idx):
@@ -1271,7 +1271,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
 
         if self.use_predictor:
             _io.model_saveobj(
-                dirname, "predictor", self._predictor, self.partial_mode
+                dirname, "predictor", self.predictor_, self.partial_mode
             )
 
     def load(self, dirname):
@@ -1312,7 +1312,7 @@ class BaseCascadeForest(BaseEstimator, metaclass=ABCMeta):
         self.binners_ = _io.model_loadobj(dirname, "binner")
         self.layers_ = _io.model_loadobj(dirname, "layer", d)
         if self.use_predictor:
-            self._predictor = _io.model_loadobj(dirname, "predictor", d)
+            self.predictor_ = _io.model_loadobj(dirname, "predictor", d)
 
         # Some checks after loading
         if len(self.layers_) != self.n_layers_:
@@ -1509,7 +1509,7 @@ class CascadeForestClassifier(BaseCascadeForest, ClassifierMixin):
                 X_middle_test_, X_aug_test_, self.n_features_
             )
 
-            predictor = self.buffer_.load_predictor(self._predictor)
+            predictor = self.buffer_.load_predictor(self.predictor_)
             proba = predictor.predict_proba(X_middle_test_)
         else:
             if self.n_layers_ > 1:
@@ -1722,7 +1722,7 @@ class CascadeForestRegressor(BaseCascadeForest, RegressorMixin):
                 X_middle_test_, X_aug_test_, self.n_features_
             )
 
-            predictor = self.buffer_.load_predictor(self._predictor)
+            predictor = self.buffer_.load_predictor(self.predictor_)
             _y = predictor.predict(X_middle_test_)
         else:
             if self.n_layers_ > 1:
