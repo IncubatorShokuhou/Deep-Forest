@@ -137,23 +137,30 @@ def _build_classifier_predictor(
         )
     # LightGBM gpu
     elif predictor_name == "lightgbm-gpu":
+        try:
+            lgb = __import__("lightgbm.sklearn")
+        except ModuleNotFoundError:
+            msg = (
+                "Cannot load the module LightGBM when building the predictor."
+                " Please make sure that LightGBM is installed."
+            )
+            raise ModuleNotFoundError(msg)
+
         device = "gpu"
         try:
             lgb_estimator = lgb.LGBMClassifier(device=device)
             lgb_estimator.fit(np.zeros((2, 2)), [0, 1])
-            del lgb
+            del lgb_estimator
         except:
             try:
                 device = "cuda"
                 lgb_estimator = lgb.LGBMClassifier(device=device)
                 lgb_estimator.fit(np.zeros((2, 2)), [0, 1])
-                del lgb
-            except ModuleNotFoundError:
-                msg = (
-                    "Cannot load the module LightGBM when building the predictor."
-                    " Please make sure that LightGBM is installed."
-                )
-                raise ModuleNotFoundError(msg)
+                del lgb_estimator
+            except:
+                raise RuntimeError(
+                        f"LightGBM GPU mode not available. Consult https://lightgbm.readthedocs.io/en/latest/GPU-Tutorial.html."
+                    )
 
         objective = "multiclass" if n_outputs > 2 else "binary"
         
@@ -279,23 +286,30 @@ def _build_regressor_predictor(
         )
     # LightGBM gpu
     elif predictor_name == "lightgbm-gpu":
+        try:
+            lgb = __import__("lightgbm.sklearn")
+        except ModuleNotFoundError:
+            msg = (
+                "Cannot load the module LightGBM when building the predictor."
+                " Please make sure that LightGBM is installed."
+            )
+            raise ModuleNotFoundError(msg)
+
         device = "gpu"
         try:
             lgb_estimator = lgb.LGBMRegressor(device=device)
             lgb_estimator.fit(np.zeros((2, 2)), [0, 1])
-            del lgb
+            del lgb_estimator
         except:
             try:
                 device = "cuda"
                 lgb_estimator = lgb.LGBMRegressor(device=device)
                 lgb_estimator.fit(np.zeros((2, 2)), [0, 1])
-                del lgb
-            except ModuleNotFoundError:
-                msg = (
-                    "Cannot load the module LightGBM when building the predictor."
-                    " Please make sure that LightGBM is installed."
-                )
-                raise ModuleNotFoundError(msg)
+                del lgb_estimator
+            except:
+                raise RuntimeError(
+                        f"LightGBM GPU mode not available. Consult https://lightgbm.readthedocs.io/en/latest/GPU-Tutorial.html."
+                    )
 
         objective = "regression"
         predictor = lgb.LGBMRegressor(
