@@ -139,14 +139,14 @@ def _build_classifier_predictor(
     elif predictor_name == "lightgbm-gpu":
         device = "gpu"
         try:
-            lgb = lgb.LGBMClassifier(device=device)
-            lgb.fit(np.zeros((2, 2)), [0, 1])
+            lgb_estimator = lgb.LGBMClassifier(device=device)
+            lgb_estimator.fit(np.zeros((2, 2)), [0, 1])
             del lgb
         except:
             try:
                 device = "cuda"
-                lgb = lgb.LGBMClassifier(device=device)
-                lgb.fit(np.zeros((2, 2)), [0, 1])
+                lgb_estimator = lgb.LGBMClassifier(device=device)
+                lgb_estimator.fit(np.zeros((2, 2)), [0, 1])
                 del lgb
             except ModuleNotFoundError:
                 msg = (
@@ -281,14 +281,14 @@ def _build_regressor_predictor(
     elif predictor_name == "lightgbm-gpu":
         device = "gpu"
         try:
-            lgb = lgb.LGBMRegressor(device=device)
-            lgb.fit(np.zeros((2, 2)), [0, 1])
+            lgb_estimator = lgb.LGBMRegressor(device=device)
+            lgb_estimator.fit(np.zeros((2, 2)), [0, 1])
             del lgb
         except:
             try:
                 device = "cuda"
-                lgb = lgb.LGBMRegressor(device=device)
-                lgb.fit(np.zeros((2, 2)), [0, 1])
+                lgb_estimator = lgb.LGBMRegressor(device=device)
+                lgb_estimator.fit(np.zeros((2, 2)), [0, 1])
                 del lgb
             except ModuleNotFoundError:
                 msg = (
